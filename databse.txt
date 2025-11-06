@@ -1,0 +1,56 @@
+package com.mit.service; 
+import java.sql.*; 
+import java.util.Scanner; 
+public class FetchStudentName  
+{ 
+ public static void main(String[] args) { 
+  // TODO Auto-generated method stub   
+        Connection conn = null; 
+        PreparedStatement pstmt = null; 
+        ResultSet rs = null; 
+        Scanner scanner = new Scanner(System.in); 
+        try { 
+            // Load Oracle JDBC Driver 
+            Class.forName("oracle.jdbc.driver.OracleDriver"); 
+ 
+52  
+ 
+            // Connect to Oracle 10g 
+            String url = "jdbc:oracle:thin:@localhost:1521:xe"; // Replace with correct SID if needed 
+            String user = "system"; // Your Oracle username 
+            String password = "system"; // Your Oracle password 
+ 
+            conn = DriverManager.getConnection(url, user, password); 
+            System.out.println("Connected to database!"); 
+            // Accept Student ID from user 
+            System.out.print("Enter Student ID: "); 
+            int student_id = scanner.nextInt(); 
+            // SQL query using PreparedStatement to prevent SQL injection 
+            String sql = "SELECT sname FROM student WHERE sid = ?"; 
+            pstmt = conn.prepareStatement(sql); 
+            pstmt.setInt(1, student_id); 
+            rs = pstmt.executeQuery(); 
+            // Display result 
+            if (rs.next()) { 
+            // int rs="select * from student"; 
+                String name = rs.getString("sname"); 
+                System.out.println("Student Name: " + name); 
+            } else { 
+                System.out.println("Student ID not found."); 
+            } 
+        } catch (ClassNotFoundException e) { 
+            System.out.println("JDBC Driver not found."); 
+            e.printStackTrace(); 
+        } catch (SQLException e) { 
+            System.out.println("Database error."); 
+            e.printStackTrace(); 
+        } finally { 
+            // Clean up resources 
+            try { if (rs != null) rs.close(); } catch (SQLException e) {} 
+            try { if (pstmt != null) pstmt.close(); } catch (SQLException e) {} 
+            try { if (conn != null) conn.close(); } catch (SQLException e) {} 
+            scanner.close(); 
+        } 
+ } 
+ 
+} 
